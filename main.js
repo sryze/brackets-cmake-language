@@ -5,15 +5,18 @@ define(function(reuire, exports, module) {
     var CodeMirror = brackets.getModule("thirdparty/CodeMirror2/lib/codemirror");
     
     CodeMirror.defineMode("cmake", function(config) {
-        var keywords = {
-            "if": [
-                "NOT","AND", "OR", "COMMAND", "POLICY", "TARGET",
-                "EXISTS", "IS_NEWER_THAN", "IS_DIRECTORY", "IS_SYMLINK",
-                "IS_ABSOLUTE", "MATCHES", "LESS", "GREATER", "EQUAL",
-                "STRLESS", "STRGREATER", "STREQUAL", "VERSION_LESS",
-                "VERSION_EQUAL", "VERSION_GREATER", "DEFINED"
-            ]
-        };
+        var commandsKeywords = [
+            {
+                commands: ["if", "else", "elseif", "endif"],
+                keywords: [
+                    "NOT","AND", "OR", "COMMAND", "POLICY", "TARGET",
+                    "EXISTS", "IS_NEWER_THAN", "IS_DIRECTORY", "IS_SYMLINK",
+                    "IS_ABSOLUTE", "MATCHES", "LESS", "GREATER", "EQUAL",
+                    "STRLESS", "STRGREATER", "STREQUAL", "VERSION_LESS",
+                    "VERSION_EQUAL", "VERSION_GREATER", "DEFINED"
+                ]
+            }
+        ];
 
         var COMMENT  = { name: "COMMENT",  regexp: /#/ };
         var QUOTE    = { name: "QUOTE",    regexp: /"/ };
@@ -55,11 +58,15 @@ define(function(reuire, exports, module) {
 
         IDENT.handle = function(stream, state, token) {
             if (state.command) {
-                var keyword = stream.current();
-                if (keywords.hasOwnProperty(state.command)
-                    && keywords[state.command].indexOf(keyword) >= 0) {
-                    token.class = "keyword";
-                }
+                commandsKeywords.every(function(ck) {
+                    var c = ck.commands.indexOf(state.command);
+                    var k = stream.current();
+                    if (c >= 0 && ck.keywords.indexOf(k) >= 0) {
+                        token.class = "keyword";
+                        return false;
+                    }
+                    return true;
+                });
             } else {
                 stream.eatSpace();
                 if (token.matchRule(LPAREN)) {
