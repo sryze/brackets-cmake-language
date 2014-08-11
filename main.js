@@ -24,8 +24,7 @@ define(function(reuire, exports, module) {
                 } else if (stream.peek() == "#") {
                     stream.skipToEnd();
                     return "comment";
-                } else if (stream.match(/\S+?\s*\(/)) {
-                    stream.backUp(1);
+                } else if (stream.match(/\S+?(?=\s*\()/)) {
                     stream.eatSpace();
                     return "keyword";
                 }
