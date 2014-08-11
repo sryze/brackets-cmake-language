@@ -1,8 +1,8 @@
 {
-    "name": "sryze.cmake",
-    "title": "CMake",
+    "name": "sryze.cmake-language",
+    "title": "CMake Language",
     "description": "Adds syntax highlighting support for the CMake language.",
-    "homepage": "https://github.com/sryze/brackets-cmake",
+    "homepage": "https://github.com/sryze/brackets-cmake-language",
     "version": "1.0.0",
     "author": "Sergey Zolotarev <sryze@yandex.com>",
     "license": "MIT",
