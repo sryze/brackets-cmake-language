@@ -47,6 +47,11 @@ define(function(reuire, exports, module) {
             state.inString = true;
             token.class = 'string';
         }
+        
+        OBRACKET.handle = function (stream, state, token) {
+            state.inBracketString = true;
+            token.class = 'string';
+        }
 
         LPAREN.handle = function (stream, state, token) {
             state.parenBalance++;
@@ -107,6 +112,13 @@ define(function(reuire, exports, module) {
                     } else {
                         stream.next();
                     }
+                } else if (state.inBracketString) {
+                    token.class = 'string';
+                    if (token.matchRule(CBRACKET)) {
+                        state.inBracketString = false;
+                    } else {
+                        stream.next();
+                    }
                 } else if (state.inBracketComment) {
                     token.class = 'comment';
                     if (token.matchRule(CBRACKET)
@@ -130,6 +142,7 @@ define(function(reuire, exports, module) {
             startState: function () {
                 return {
                     inString: false,
+                    inBracketString: false,
                     inBracketComment: false,
                     command: null,
                     bracketLength: 0,
