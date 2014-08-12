@@ -1,19 +1,25 @@
 define(function(reuire, exports, module) {
     'use strict';
-    
+   
     var LanguageManager = brackets.getModule('language/LanguageManager');
     var CodeMirror = brackets.getModule('thirdparty/CodeMirror2/lib/codemirror');
+    var ExtensionUtils = brackets.getModule('utils/ExtensionUtils');
     
     CodeMirror.defineMode('cmake', function (config) {
-        var keywords = {
-            'if': [
-                'NOT','AND', 'OR', 'COMMAND', 'POLICY', 'TARGET',
-                'EXISTS', 'IS_NEWER_THAN', 'IS_DIRECTORY', 'IS_SYMLINK',
-                'IS_ABSOLUTE', 'MATCHES', 'LESS', 'GREATER', 'EQUAL',
-                'STRLESS', 'STRGREATER', 'STREQUAL', 'VERSION_LESS',
-                'VERSION_EQUAL', 'VERSION_GREATER', 'DEFINED'
-            ]
-        };
+        var keywords =
+            ExtensionUtils.loadFile(module, 'commands.json').then(JSON.parse);
+
+        var condKeywords = [
+            'NOT','AND', 'OR', 'COMMAND', 'POLICY', 'TARGET',
+            'EXISTS', 'IS_NEWER_THAN', 'IS_DIRECTORY', 'IS_SYMLINK',
+            'IS_ABSOLUTE', 'MATCHES', 'LESS', 'GREATER', 'EQUAL',
+            'STRLESS', 'STRGREATER', 'STREQUAL', 'VERSION_LESS',
+            'VERSION_EQUAL', 'VERSION_GREATER', 'DEFINED'
+        ];
+                            
+        ['if', 'else', 'elseif', 'endif'].forEach(function (cmd) {
+            keywords[cmd] = condKeywords;
+        });
 
         var COMMENT  = { name: 'COMMENT',  regexp: /#/ };
         var QUOTE    = { name: 'QUOTE',    regexp: /"/ };
