@@ -1,27 +1,18 @@
 (function () {
     var fs = require('fs');
 
-    function findAll(regexp, text) {
-        var resuls;
-        var matches = [];
-        while ((results = regexp.exec(text)) != null) {
-            matches.push(results[0]);
-        }
-        return matches;
-    }
-
     var options = { encoding: 'utf-8' };
     var text = fs.readFileSync('commands.txt', options);
     var keywords = {};
-    var commands = findAll(/[a-zA-Z_][a-zA-Z0-9_]*(?=\r?\n[-]+)/gm, text);
+    var commands = text.match(/[a-zA-Z_][a-zA-Z0-9_]*(?=\r?\n[-]+)/gm);
 
     commands.forEach(function (cmd) {
         var pattern = '::\\r?\\n\\r?\\n ' + cmd
                     + '\([\\s\\S]*?\)(?=\\r?\\n\\r?\\n)';
-        var declarations = findAll(new RegExp(pattern, 'gm'), text);     
+        var declarations = text.match(new RegExp(pattern, 'gm')) || [];
         var args = [];
         declarations.forEach(function (decl) {
-            args = args.concat(findAll(/\b[A-Z_][A-Z0-9_]*\b/g, decl));
+            args = args.concat(decl.match(/\b[A-Z_][A-Z0-9_]*\b/g) || []);
         });
         keywords[cmd] = args.filter(function(elem, pos) {
             return args.indexOf(elem) == pos;
