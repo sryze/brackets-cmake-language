@@ -1,24 +1,27 @@
 define(function(reuire, exports, module) {
     'use strict';
-   
+
     var LanguageManager = brackets.getModule('language/LanguageManager');
     var CodeMirror = brackets.getModule('thirdparty/CodeMirror2/lib/codemirror');
     var ExtensionUtils = brackets.getModule('utils/ExtensionUtils');
     
     CodeMirror.defineMode('cmake', function (config) {
-        var keywords =
-            ExtensionUtils.loadFile(module, 'commands.json').then(JSON.parse);
-
-        var condKeywords = [
-            'NOT','AND', 'OR', 'COMMAND', 'POLICY', 'TARGET',
-            'EXISTS', 'IS_NEWER_THAN', 'IS_DIRECTORY', 'IS_SYMLINK',
-            'IS_ABSOLUTE', 'MATCHES', 'LESS', 'GREATER', 'EQUAL',
-            'STRLESS', 'STRGREATER', 'STREQUAL', 'VERSION_LESS',
-            'VERSION_EQUAL', 'VERSION_GREATER', 'DEFINED'
-        ];
-                            
+        var keywords = {};
+        
         ['if', 'else', 'elseif', 'endif'].forEach(function (cmd) {
-            keywords[cmd] = condKeywords;
+            keywords[cmd] = [
+                'NOT','AND', 'OR', 'COMMAND', 'POLICY', 'TARGET',
+                'EXISTS', 'IS_NEWER_THAN', 'IS_DIRECTORY', 'IS_SYMLINK',
+                'IS_ABSOLUTE', 'MATCHES', 'LESS', 'GREATER', 'EQUAL',
+                'STRLESS', 'STRGREATER', 'STREQUAL', 'VERSION_LESS',
+                'VERSION_EQUAL', 'VERSION_GREATER', 'DEFINED'
+            ];
+        });
+
+        ExtensionUtils.loadFile(module, 'commands.json').then(function (data) {
+            $.each(JSON.parse(data), function (cmd, args) {
+                keywords[cmd] = (keywords[cmd] || []).concat(args);
+            });
         });
 
         var COMMENT  = { name: 'COMMENT',  regexp: /#/ };
@@ -47,7 +50,7 @@ define(function(reuire, exports, module) {
             state.inString = true;
             token.class = 'string';
         }
-        
+
         OBRACKET.handle = function (stream, state, token) {
             state.inBracketString = true;
             token.class = 'string';
@@ -89,7 +92,7 @@ define(function(reuire, exports, module) {
             COMMENT, QUOTE, OBRACKET, CBRACKET, SPACE, LPAREN,
             RPAREN, IDENT, VARREF, ARGUMENT
         ];
-        
+
         return {
             token: function (stream, state) {
                 var token = {
@@ -104,7 +107,7 @@ define(function(reuire, exports, module) {
                         return (token.match = null);
                     }
                 };
-                
+
                 if (state.inString) {
                     token.class = 'string';
                     if (token.matchRule(QUOTE)) {
@@ -135,10 +138,10 @@ define(function(reuire, exports, module) {
                         return !token.match;
                     });
                 }
-        
+
                 return token.class;
             },
-            
+
             startState: function () {
                 return {
                     inString: false,
@@ -155,7 +158,7 @@ define(function(reuire, exports, module) {
     });
 
     CodeMirror.defineMIME('text/x-cmake', 'cmake');
-    
+
     LanguageManager.defineLanguage('cmake', {
         name: 'CMake',
         mode: 'cmake',
