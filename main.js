@@ -33,7 +33,7 @@ define(function(reuire, exports, module) {
         var RPAREN   = { name: 'RPAREN',   regexp: /\)/ };
         var IDENT    = { name: 'IDENT',    regexp: /[A-Za-z_][A-Za-z0-9_]*/ };
         var VARREF   = { name: 'VARREF',   regexp: /\$(ENV)?{.*?}/ };
-        var ARGUMENT = { name: 'ARGUMENT', regexp: /[^()#"\\]+/ };
+        var ANYCHAR  = { name: 'ANYCHAR',  regexp: /./ };
 
         COMMENT.handle = function (stream, state, token) {
             if (token.matchRule(OBRACKET)) {
@@ -89,8 +89,8 @@ define(function(reuire, exports, module) {
         }
 
         var rules = [
-            COMMENT, QUOTE, OBRACKET, CBRACKET, SPACE, LPAREN,
-            RPAREN, IDENT, VARREF, ARGUMENT
+            COMMENT, QUOTE, OBRACKET, CBRACKET, SPACE, LPAREN, RPAREN,
+            IDENT, VARREF, ANYCHAR
         ];
 
         return {
