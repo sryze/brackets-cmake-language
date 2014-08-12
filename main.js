@@ -7,6 +7,7 @@ define(function(reuire, exports, module) {
     
     CodeMirror.defineMode('cmake', function (config) {
         var keywords = {};
+        var globalKeywords = ["ON", "OFF", "TRUE", "FALSE"];
         
         ['if', 'else', 'elseif', 'endif'].forEach(function (cmd) {
             keywords[cmd] = [
@@ -69,9 +70,10 @@ define(function(reuire, exports, module) {
 
         IDENT.handle = function (stream, state, token) {
             if (state.command) {
-                var keyword = stream.current();
-                if (keywords.hasOwnProperty(state.command)
-                    && keywords[state.command].indexOf(keyword) >= 0) {
+                var arg = stream.current();
+                if (globalKeywords.indexOf(arg) >= 0
+                    || (keywords.hasOwnProperty(state.command)
+                        && keywords[state.command].indexOf(arg) >= 0)) {
                     token.class = 'keyword';
                 }
             } else {
