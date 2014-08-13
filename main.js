@@ -4,11 +4,11 @@ define(function(reuire, exports, module) {
     var LanguageManager = brackets.getModule('language/LanguageManager');
     var CodeMirror = brackets.getModule('thirdparty/CodeMirror2/lib/codemirror');
     var ExtensionUtils = brackets.getModule('utils/ExtensionUtils');
-    
+
     CodeMirror.defineMode('cmake', function (config) {
         var keywords = {};
         var globalKeywords = ["ON", "OFF", "TRUE", "FALSE"];
-        
+
         ['if', 'else', 'elseif', 'endif'].forEach(function (cmd) {
             keywords[cmd] = [
                 'NOT','AND', 'OR', 'COMMAND', 'POLICY', 'TARGET',
@@ -132,7 +132,7 @@ define(function(reuire, exports, module) {
                     } else {
                         stream.next();
                     }
-                } else {               
+                } else {
                     rules.every(function(r) {
                         if (token.matchRule(r) && r.hasOwnProperty('handle')) {
                             r.handle(stream, state, token);
@@ -153,7 +153,7 @@ define(function(reuire, exports, module) {
                     bracketLength: 0,
                     parenBalance: 0
                 };
-            },   
+            },
 
             lineComment: '#'
         };
