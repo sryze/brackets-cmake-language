@@ -155,7 +155,9 @@ define(function(reuire, exports, module) {
                 };
             },
 
-            lineComment: '#'
+            lineComment: '#',
+            blockCommentStart: '#[=[',
+            blockCommentEnd: ']=]'
         };
     });
 
