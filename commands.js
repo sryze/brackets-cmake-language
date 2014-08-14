@@ -19,6 +19,5 @@
         }).sort();
     });
 
-    var json = JSON.stringify(keywords, null, 4);
-    fs.writeFileSync('commands.json', json, options);
+    fs.writeFileSync('commands.json', JSON.stringify(keywords), options);
 })();
