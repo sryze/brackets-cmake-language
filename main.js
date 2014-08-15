@@ -59,6 +59,8 @@ define(function(reuire, exports, module) {
         RPAREN.handle = function (stream, state, token) {
             state.parenBalance--;
             if (state.parenBalance == 0) {
+                state.lastIndentation = stream.indentation();
+                state.lastCommand = state.command;
                 state.command = null;
             }
         }
@@ -91,6 +93,20 @@ define(function(reuire, exports, module) {
         ];
 
         return {
+            startState: function () {
+                return {
+                    inString: false,
+                    inBracketString: false,
+                    inBracketComment: false,
+                    command: null,
+                    lastCommand: null,
+                    indentation: 0,
+                    lastIndentation: 0,
+                    bracketLength: 0,
+                    parenBalance: 0
+                };
+            },
+
             token: function (stream, state) {
                 var token = {
                     rule: null,
@@ -104,6 +120,8 @@ define(function(reuire, exports, module) {
                         return (token.match = null);
                     }
                 };
+                
+                state.indentation = stream.indentation();
 
                 if (state.inString) {
                     token.class = "string";
@@ -139,15 +157,16 @@ define(function(reuire, exports, module) {
                 return token.class;
             },
 
-            startState: function () {
-                return {
-                    inString: false,
-                    inBracketString: false,
-                    inBracketComment: false,
-                    command: null,
-                    bracketLength: 0,
-                    parenBalance: 0
-                };
+            indent: function (state, textAfter) {
+                if (["if", "elseif", "else", "foreach", "macro", "function"]
+                        .indexOf(state.lastCommand) >= 0) {
+                    return state.lastIndentation + config.indentUnit;
+                }
+                if (["elseif", "else", "endif", "endforeach", "endmacro", "endfunction"]
+                        .indexOf(state.command) >= 0) {
+                    return state.lastIndentation - config.indentUnit;
+                }
+                return CodeMirror.Pass;
             },
 
             lineComment: "#",
