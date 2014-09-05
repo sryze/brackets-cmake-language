@@ -22,8 +22,8 @@ define(function(reuire, exports, module) {
 
         var COMMENT  = { name: "COMMENT",  regexp: /#/ };
         var QUOTE    = { name: "QUOTE",    regexp: /"/ };
-        var OBRACKET = { name: "OBRACKET", regexp: /\[([=]*)\[/ };
-        var CBRACKET = { name: "CBRACKET", regexp: /\]([=]*)\]/ };
+        var LBRACKET = { name: "LBRACKET", regexp: /\[([=]*)\[/ };
+        var RBRACKET = { name: "RBRACKET", regexp: /\]([=]*)\]/ };
         var SPACE    = { name: "SPACE",    regexp: /\s+/ };
         var LPAREN   = { name: "LPAREN",   regexp: /\(/ };
         var RPAREN   = { name: "RPAREN",   regexp: /\)/ };
@@ -32,7 +32,7 @@ define(function(reuire, exports, module) {
         var ANYCHAR  = { name: "ANYCHAR",  regexp: /./ };
 
         COMMENT.handle = function (stream, state, token) {
-            if (token.matchRule(OBRACKET)) {
+            if (token.matchRule(LBRACKET)) {
                 state.inBracketComment = true;
                 state.bracketLength = token.match[0].length;
                 token.class = "comment";
@@ -47,7 +47,7 @@ define(function(reuire, exports, module) {
             token.class = "string";
         }
 
-        OBRACKET.handle = function (stream, state, token) {
+        LBRACKET.handle = function (stream, state, token) {
             state.inBracketString = true;
             token.class = "string";
         }
@@ -86,7 +86,7 @@ define(function(reuire, exports, module) {
         }
 
         var rules = [
-            COMMENT, QUOTE, OBRACKET, CBRACKET, SPACE, LPAREN, RPAREN,
+            COMMENT, QUOTE, LBRACKET, RBRACKET, SPACE, LPAREN, RPAREN,
             IDENT, VARREF, ANYCHAR
         ];
 
@@ -114,14 +114,14 @@ define(function(reuire, exports, module) {
                     }
                 } else if (state.inBracketString) {
                     token.class = "string";
-                    if (token.matchRule(CBRACKET)) {
+                    if (token.matchRule(RBRACKET)) {
                         state.inBracketString = false;
                     } else {
                         stream.next();
                     }
                 } else if (state.inBracketComment) {
                     token.class = "comment";
-                    if (token.matchRule(CBRACKET)
+                    if (token.matchRule(RBRACKET)
                         && token.match[0].length == state.bracketLength) {
                         state.inBracketComment = false;
                     } else {
